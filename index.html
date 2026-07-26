@@ -93,6 +93,39 @@
   .cell-insider { font-family:var(--font-display); font-weight:800; font-size:9px; letter-spacing:.18em;
     text-transform:uppercase; color:#F0C05A; opacity:.85; }
 
+  /* ---- Locked insider cells (the 500 row): never open on the site ---- */
+  .cell.is-locked { cursor:not-allowed; }
+  .cell.is-locked:hover { transform:none; }
+  .cell-front.is-locked { background:linear-gradient(180deg,#0C1738 0%,#060D26 100%);
+    border:1px dashed rgba(240,192,90,.45); box-shadow:inset 0 1px 0 rgba(255,255,255,.05), 0 10px 22px rgba(0,0,0,.4); }
+  .cell.is-locked:hover .cell-front { border-color:rgba(240,192,90,.75);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.08), 0 10px 22px rgba(0,0,0,.4), 0 0 26px rgba(240,192,90,.18); }
+
+  .lock-row { display:flex; align-items:center; justify-content:center; gap:7px; color:#F0C05A; }
+  .lock-row .price { font-family:var(--font-display); font-weight:900; font-size:clamp(18px,3vw,30px);
+    letter-spacing:-.01em; color:rgba(240,192,90,.62); }
+
+  /* the gold flash that answers a click on a locked cell */
+  .lock-flash { position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+    background:linear-gradient(180deg,rgba(240,192,90,.96),rgba(220,168,60,.96)); color:#0A1330;
+    font-family:var(--font-display); font-weight:900; text-transform:uppercase; text-align:center;
+    font-size:clamp(9px,1.25vw,12px); letter-spacing:.1em; padding:6px; opacity:0; pointer-events:none; }
+
+  @keyframes lockShake {
+    0%,100% { transform:translateX(0); }
+    15% { transform:translateX(-4px); } 30% { transform:translateX(4px); }
+    45% { transform:translateX(-3px); } 60% { transform:translateX(3px); }
+    80% { transform:translateX(-1.5px); }
+  }
+  @keyframes lockFlash { 0% { opacity:0; } 12% { opacity:1; } 68% { opacity:1; } 100% { opacity:0; } }
+
+  .cell.is-shaking .cell-inner { animation:lockShake .5s cubic-bezier(.36,.07,.19,.97); }
+  .cell.is-shaking .lock-flash { animation:lockFlash 1.5s ease; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .cell.is-shaking .cell-inner { animation:none; }
+  }
+
   /* the back face of a cell opened after the five reveals are spent */
   .cell-back.is-secret { background:linear-gradient(180deg,#0E1A44 0%,#070E2A 100%);
     border-color:rgba(240,192,90,.3); box-shadow:inset 0 1px 0 rgba(255,255,255,.05), 0 10px 22px rgba(0,0,0,.38); }
@@ -191,7 +224,7 @@
       </div>
 
       <div data-reveal style="display:flex; flex-wrap:wrap; align-items:center; justify-content:center; gap:14px; margin-bottom:clamp(20px,2.5vw,22px);">
-        <span style="font-size:clamp(13px,1.7vw,15px); line-height:1.45; color:#8E9CC6; max-width:520px;">До эфира можно вскрыть пять клеток — выбирайте любые. Остальные пятнадцать откроем в прямом эфире.</span>
+        <span style="font-size:clamp(13px,1.7vw,15px); line-height:1.45; color:#8E9CC6; max-width:560px;">До эфира можно вскрыть пять клеток — выбирайте любые. Клетки за 500 под замком: инсайды открою только в прямом эфире.</span>
         <span id="reveal-counter" class="reveal-counter" role="status" aria-live="polite"><span class="dot"></span><span id="reveal-counter-text"></span></span>
       </div>
 
@@ -413,6 +446,34 @@
 
   function pad(v) { return String(v).padStart(2, '0'); }
 
+  // padlock drawn inline so it inherits the cell's gold and needs no asset
+  function lockIcon() {
+    var ns = 'http://www.w3.org/2000/svg';
+    var svg = document.createElementNS(ns, 'svg');
+    svg.setAttribute('viewBox', '0 0 24 24');
+    svg.setAttribute('width', '15');
+    svg.setAttribute('height', '15');
+    svg.setAttribute('fill', 'none');
+    svg.setAttribute('aria-hidden', 'true');
+    svg.style.flex = 'none';
+
+    var shackle = document.createElementNS(ns, 'path');
+    shackle.setAttribute('d', 'M8 10.5V7a4 4 0 0 1 8 0v3.5');
+    shackle.setAttribute('stroke', 'currentColor');
+    shackle.setAttribute('stroke-width', '2.2');
+    shackle.setAttribute('stroke-linecap', 'round');
+
+    var body = document.createElementNS(ns, 'rect');
+    body.setAttribute('x', '4.2'); body.setAttribute('y', '10.5');
+    body.setAttribute('width', '15.6'); body.setAttribute('height', '9.8');
+    body.setAttribute('rx', '2.4');
+    body.setAttribute('fill', 'currentColor');
+
+    svg.appendChild(shackle);
+    svg.appendChild(body);
+    return svg;
+  }
+
   // ---- Air date labels ----
   Array.prototype.forEach.call(document.querySelectorAll('[data-air-date]'), function (n) {
     n.textContent = CONFIG.airDate;
@@ -445,20 +506,35 @@
       var wrap = el('div', { 'class': 'cell-wrap' });
       wrap.style.setProperty('--d', (0.05 * (ci + ri * 1.4)).toFixed(2) + 's');
 
+      var locked = ri === INSIDER_ROW; // insider row — sealed until the broadcast
+
       var cell = el('button', {
-        'class': 'cell',
+        'class': 'cell' + (locked ? ' is-locked' : ''),
         type: 'button',
         'aria-expanded': 'false',
-        'aria-label': column.title + ', ' + price + '. Показать тему'
+        'aria-label': locked
+          ? column.title + ', ' + price + '. Инсайд под замком — откроется только на эфире'
+          : column.title + ', ' + price + '. Показать тему'
       });
+      // No aria-disabled: the button does respond to a click (padlock rattle plus
+      // banner), and the label above already says the cell will not open.
 
       var inner = el('div', { 'class': 'cell-inner' });
+      var front = el('div', { 'class': 'cell-face cell-front' + (locked ? ' is-locked' : '') });
 
-      var front = el('div', { 'class': 'cell-face cell-front' });
-      front.appendChild(el('span', {
-        style: 'font-family:var(--font-display); font-weight:900; font-size:clamp(20px,3.4vw,34px); letter-spacing:-.01em; color:#F0C05A; text-shadow:0 2px 14px rgba(240,192,90,.35);',
-        text: String(price)
-      }));
+      if (locked) {
+        var row = el('div', { 'class': 'lock-row' });
+        row.appendChild(lockIcon());
+        row.appendChild(el('span', { 'class': 'price', text: String(price) }));
+        front.appendChild(row);
+        front.appendChild(el('span', { 'class': 'cell-insider', text: 'инсайд' }));
+        front.appendChild(el('span', { 'class': 'lock-flash', text: 'Только на эфире' }));
+      } else {
+        front.appendChild(el('span', {
+          style: 'font-family:var(--font-display); font-weight:900; font-size:clamp(20px,3.4vw,34px); letter-spacing:-.01em; color:#F0C05A; text-shadow:0 2px 14px rgba(240,192,90,.35);',
+          text: String(price)
+        }));
+      }
 
       // The back face is filled at click time: the first REVEAL_BUDGET cells get the
       // real topic, everything after that gets the «секрет» tease instead.
@@ -469,7 +545,12 @@
       cell.appendChild(inner);
 
       cell.addEventListener('click', function () {
-        openCell(cell, back, topic, ri, column.title, price);
+        if (locked) { rattle(cell); return; }
+        openCell(cell, back, topic, column.title, price);
+      });
+
+      cell.addEventListener('animationend', function (e) {
+        if (e.animationName === 'lockFlash') cell.classList.remove('is-shaking');
       });
 
       allCells.push(cell);
@@ -496,7 +577,14 @@
     }
   }
 
-  function openCell(cell, back, topic, ri, columnTitle, price) {
+  // A locked cell refuses to open: the padlock rattles and a gold banner flashes.
+  function rattle(cell) {
+    cell.classList.remove('is-shaking');
+    void cell.offsetWidth; // restart the animation when clicked again mid-flash
+    cell.classList.add('is-shaking');
+  }
+
+  function openCell(cell, back, topic, columnTitle, price) {
     if (cell.classList.contains('is-resolved')) return; // an opened cell stays as it is
 
     var secret = revealsLeft <= 0;
@@ -505,14 +593,8 @@
     if (secret) {
       back.classList.add('is-secret');
       back.appendChild(el('span', { 'class': 'cell-secret-label', text: 'Секрет' }));
-      back.appendChild(el('span', {
-        'class': 'cell-secret-note',
-        text: ri === INSIDER_ROW ? 'инсайд — только на эфире' : 'узнаете на эфире'
-      }));
+      back.appendChild(el('span', { 'class': 'cell-secret-note', text: 'узнаете на эфире' }));
     } else {
-      if (ri === INSIDER_ROW) {
-        back.appendChild(el('span', { 'class': 'cell-insider', text: 'инсайд' }));
-      }
       back.appendChild(el('span', { 'class': 'cell-topic', text: topic }));
     }
 
