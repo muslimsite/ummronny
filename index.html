@@ -28,7 +28,27 @@
   a:hover { color:#FFD98A; }
   input::placeholder { color:#6C7CA8; }
   @keyframes studioPulse { 0%,100% { opacity:.55; } 50% { opacity:.85; } }
-  @keyframes cellIn { from { opacity:0; transform:translateY(16px) scale(.94); } to { opacity:1; transform:none; } }
+
+  /* Scroll reveal. The hidden state is scoped to .js-anim, which JS puts on <html>,
+     so the page stays fully readable if the script never runs. --d staggers a group. */
+  .js-anim .reveal {
+    opacity:0; transform:translateY(24px);
+    transition:opacity .7s cubic-bezier(.22,1,.36,1) var(--d,0s),
+               transform .7s cubic-bezier(.22,1,.36,1) var(--d,0s);
+  }
+  .js-anim .reveal.is-in { opacity:1; transform:none; }
+
+  /* Board cells keep the original diagonal cascade, now triggered on scroll. */
+  .js-anim .cell-wrap {
+    opacity:0; transform:translateY(16px) scale(.94);
+    transition:opacity .5s cubic-bezier(.22,1,.36,1) var(--d,0s),
+               transform .5s cubic-bezier(.22,1,.36,1) var(--d,0s);
+  }
+  .js-anim .cell-wrap.is-in { opacity:1; transform:none; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .js-anim .reveal, .js-anim .cell-wrap { opacity:1; transform:none; transition:none; }
+  }
 
   .btn-fire {
     appearance:none; border:none; cursor:pointer; display:inline-flex; align-items:center; justify-content:center;
@@ -120,19 +140,19 @@
 <div style="background:#050D24; font-family:var(--font-body); color:#EAEFFB; overflow:hidden; position:relative;">
 
   <!-- 1. HERO -->
-  <section style="position:relative; padding:clamp(48px,9vw,104px) clamp(16px,5vw,40px) clamp(36px,6vw,64px);">
+  <section style="position:relative; padding:clamp(60px,9vw,104px) clamp(22px,5vw,40px) clamp(56px,6vw,64px);">
     <div style="position:absolute; inset:-30% 10% auto 10%; height:520px; background:radial-gradient(ellipse at 50% 0%, rgba(240,192,90,.20), rgba(5,13,36,0) 65%); animation:studioPulse 7s ease-in-out infinite; pointer-events:none;"></div>
-    <div style="position:relative; max-width:1080px; margin:0 auto; display:flex; flex-direction:column; align-items:center; gap:clamp(18px,3vw,28px); text-align:center;">
+    <div data-reveal-group data-reveal-step="0.09" style="position:relative; max-width:1080px; margin:0 auto; display:flex; flex-direction:column; align-items:center; gap:clamp(28px,3.4vw,30px); text-align:center;">
       <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:10px;">
         <span style="font-family:var(--font-display); font-weight:700; font-size:12px; letter-spacing:.16em; text-transform:uppercase; color:#0A1330; background:linear-gradient(180deg,#F6D27A,#DCA83C); padding:8px 16px; border-radius:999px;">Бесплатный эфир</span>
         <span style="font-family:var(--font-display); font-weight:700; font-size:12px; letter-spacing:.16em; text-transform:uppercase; color:#F0C05A; border:1px solid rgba(240,192,90,.4); padding:8px 16px; border-radius:999px;">Для сестёр-экспертов</span>
       </div>
-      <h1 style="margin:0; font-family:var(--font-display); font-weight:900; text-transform:uppercase; font-size:clamp(30px,7.2vw,68px); line-height:.98; letter-spacing:-.025em; text-wrap:balance;">Маркетинг 2026:<br><span style="color:#F0C05A;">тренды, которые принесут деньги</span></h1>
-      <p style="margin:0; max-width:660px; font-size:clamp(16px,2.2vw,20px); line-height:1.55; color:#B9C4E4; text-wrap:pretty;">Бесплатный эфир для сестёр-экспертов, которые ведут блог без лица и голоса и хотят наконец получать с него доход, иншаАллах.</p>
+      <h1 style="margin:0; font-family:var(--font-display); font-weight:900; text-transform:uppercase; font-size:clamp(30px,7.2vw,68px); line-height:1.03; letter-spacing:-.025em; text-wrap:balance;">Маркетинг 2026:<br><span style="color:#F0C05A;">тренды, которые принесут деньги</span></h1>
+      <p style="margin:0; max-width:660px; font-size:clamp(16px,2.2vw,20px); line-height:1.6; color:#B9C4E4; text-wrap:pretty;">Бесплатный эфир для сестёр-экспертов, которые ведут блог без лица и голоса и хотят наконец получать с него доход, иншаАллах.</p>
 
-      <div id="timer" style="display:grid; grid-template-columns:repeat(4, minmax(64px, 92px)); gap:clamp(6px,1vw,10px);"></div>
+      <div id="timer" style="display:grid; grid-template-columns:repeat(4, minmax(64px, 92px)); gap:clamp(8px,1vw,10px);"></div>
 
-      <div style="display:flex; flex-direction:column; align-items:center; gap:14px;">
+      <div style="display:flex; flex-direction:column; align-items:center; gap:clamp(18px,2.5vw,20px);">
         <button type="button" class="btn-fire" data-goto-form>ИДУ НА ЭФИР — БЕСПЛАТНО</button>
         <div style="display:flex; align-items:center; gap:10px; font-size:14px; letter-spacing:.06em; text-transform:uppercase; color:#8E9CC6; font-family:var(--font-display); font-weight:600;">
           <span style="width:6px; height:6px; border-radius:999px; background:#F0C05A; display:inline-block;"></span>
@@ -143,20 +163,20 @@
   </section>
 
   <!-- 2. GAME BOARD -->
-  <section style="padding:clamp(24px,4vw,40px) clamp(12px,4vw,40px) clamp(48px,8vw,88px);">
+  <section style="padding:clamp(36px,4vw,40px) clamp(18px,4vw,40px) clamp(64px,8vw,88px);">
     <div style="max-width:1120px; margin:0 auto;">
-      <div style="text-align:center; margin-bottom:clamp(20px,4vw,36px);">
+      <div data-reveal style="text-align:center; margin-bottom:clamp(28px,4vw,36px);">
         <div style="font-family:var(--font-display); font-weight:700; font-size:12px; letter-spacing:.22em; text-transform:uppercase; color:#7C8CBC; margin-bottom:10px;">Игра начинается</div>
-        <div style="font-family:var(--font-display); font-weight:900; text-transform:uppercase; font-size:clamp(26px,5.5vw,52px); line-height:1; letter-spacing:-.02em; color:#F0C05A; text-shadow:0 0 34px rgba(240,192,90,.35);">Свои запуски</div>
-        <p style="margin:12px auto 0; max-width:600px; font-size:clamp(15px,1.9vw,17px); line-height:1.5; color:#B9C4E4; text-wrap:pretty;">Эфир пройдёт в формате игры: четыре темы, двадцать закрытых клеток. Открываем их вместе в прямом эфире — и разбираем на ваших примерах.</p>
-        <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:8px; margin-top:14px;">
+        <div style="font-family:var(--font-display); font-weight:900; text-transform:uppercase; font-size:clamp(26px,5.5vw,52px); line-height:1.04; letter-spacing:-.02em; color:#F0C05A; text-shadow:0 0 34px rgba(240,192,90,.35);">Свои запуски</div>
+        <p style="margin:14px auto 0; max-width:600px; font-size:clamp(15px,1.9vw,17px); line-height:1.55; color:#B9C4E4; text-wrap:pretty;">Эфир пройдёт в формате игры: четыре темы, двадцать закрытых клеток. Открываем их вместе в прямом эфире — и разбираем на ваших примерах.</p>
+        <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:8px; margin-top:18px;">
           <span style="font-family:var(--font-display); font-weight:700; font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:#F0C05A; border:1px solid rgba(240,192,90,.35); border-radius:999px; padding:7px 14px;">4 темы</span>
           <span style="font-family:var(--font-display); font-weight:700; font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:#F0C05A; border:1px solid rgba(240,192,90,.35); border-radius:999px; padding:7px 14px;">20 вопросов</span>
           <span style="font-family:var(--font-display); font-weight:700; font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:#F0C05A; border:1px solid rgba(240,192,90,.35); border-radius:999px; padding:7px 14px;">Разбор в прямом эфире</span>
         </div>
       </div>
 
-      <div style="display:flex; flex-wrap:wrap; align-items:center; justify-content:center; gap:12px; margin-bottom:clamp(14px,2.5vw,22px);">
+      <div data-reveal style="display:flex; flex-wrap:wrap; align-items:center; justify-content:center; gap:14px; margin-bottom:clamp(20px,2.5vw,22px);">
         <span style="font-size:clamp(13px,1.7vw,15px); line-height:1.45; color:#8E9CC6;">Нажмите на клетку — покажу тему. Разбор каждой — в прямом эфире.</span>
         <button type="button" id="reveal-all" class="reveal-all" aria-pressed="false">Показать все темы</button>
       </div>
@@ -166,29 +186,29 @@
   </section>
 
   <!-- 3. PAINS -->
-  <section style="padding:clamp(44px,7vw,88px) clamp(16px,5vw,40px); background:linear-gradient(180deg,#050D24 0%,#08122E 40%,#050D24 100%);">
+  <section style="padding:clamp(64px,7vw,88px) clamp(22px,5vw,40px); background:linear-gradient(180deg,#050D24 0%,#08122E 40%,#050D24 100%);">
     <div style="max-width:960px; margin:0 auto;">
-      <h2 style="margin:0 0 clamp(20px,3.5vw,36px); font-family:var(--font-display); font-weight:900; text-transform:uppercase; font-size:clamp(24px,4.6vw,44px); line-height:1.02; letter-spacing:-.02em; text-align:center;">Этот эфир для вас, <span style="color:#F0C05A;">если</span></h2>
-      <div id="pains" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:clamp(10px,1.6vw,14px);"></div>
+      <h2 data-reveal style="margin:0 0 clamp(30px,3.5vw,36px); font-family:var(--font-display); font-weight:900; text-transform:uppercase; font-size:clamp(24px,4.6vw,44px); line-height:1.06; letter-spacing:-.02em; text-align:center;">Этот эфир для вас, <span style="color:#F0C05A;">если</span></h2>
+      <div id="pains" data-reveal-group data-reveal-step="0.06" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:clamp(12px,1.6vw,14px);"></div>
     </div>
   </section>
 
   <!-- 4. TOPICS -->
-  <section style="padding:clamp(44px,7vw,88px) clamp(16px,5vw,40px);">
+  <section style="padding:clamp(64px,7vw,88px) clamp(22px,5vw,40px);">
     <div style="max-width:1080px; margin:0 auto;">
-      <div style="text-align:center; margin-bottom:clamp(20px,3.5vw,36px);">
+      <div data-reveal style="text-align:center; margin-bottom:clamp(30px,3.5vw,36px);">
         <div style="font-family:var(--font-display); font-weight:700; font-size:12px; letter-spacing:.22em; text-transform:uppercase; color:#7C8CBC; margin-bottom:10px;">Раунд второй</div>
-        <h2 style="margin:0; font-family:var(--font-display); font-weight:900; text-transform:uppercase; font-size:clamp(24px,4.6vw,44px); line-height:1.02; letter-spacing:-.02em;">Что вы узнаете <span style="color:#F0C05A;">на эфире</span></h2>
+        <h2 style="margin:0; font-family:var(--font-display); font-weight:900; text-transform:uppercase; font-size:clamp(24px,4.6vw,44px); line-height:1.06; letter-spacing:-.02em;">Что вы узнаете <span style="color:#F0C05A;">на эфире</span></h2>
       </div>
-      <div id="topics" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(270px, 1fr)); gap:clamp(10px,1.6vw,16px);"></div>
+      <div id="topics" data-reveal-group data-reveal-step="0.07" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(270px, 1fr)); gap:clamp(12px,1.6vw,16px);"></div>
     </div>
   </section>
 
   <!-- 5. ABOUT -->
-  <section style="padding:clamp(44px,7vw,88px) clamp(16px,5vw,40px); background:linear-gradient(180deg,#050D24 0%,#08122E 45%,#050D24 100%);">
+  <section style="padding:clamp(64px,7vw,88px) clamp(22px,5vw,40px); background:linear-gradient(180deg,#050D24 0%,#08122E 45%,#050D24 100%);">
     <div style="max-width:1000px; margin:0 auto;">
-      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px,1fr)); gap:clamp(20px,3vw,40px); align-items:center; margin-bottom:clamp(28px,4vw,48px);">
-        <div style="display:flex; flex-direction:column; gap:14px;">
+      <div data-reveal-group data-reveal-step="0.1" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px,1fr)); gap:clamp(28px,3vw,40px); align-items:center; margin-bottom:clamp(40px,4vw,48px);">
+        <div style="display:flex; flex-direction:column; gap:16px;">
           <div style="display:flex; align-items:center; gap:16px;">
             <img src="uploads/avatar.png" alt="Юлия Умм Ронни" width="104" height="104" style="flex:none; width:clamp(78px,12vw,104px); height:clamp(78px,12vw,104px); border-radius:999px; object-fit:cover; border:2px solid rgba(240,192,90,.55); box-shadow:0 0 28px rgba(240,192,90,.28);">
             <div style="display:flex; flex-direction:column; gap:8px;">
@@ -204,16 +224,16 @@
         </div>
       </div>
 
-      <div style="font-family:var(--font-display); font-weight:800; font-size:13px; letter-spacing:.18em; text-transform:uppercase; color:#7C8CBC; margin-bottom:14px;">С кем я работала</div>
-      <div id="cases" style="display:flex; flex-direction:column; gap:8px;"></div>
-      <p style="margin:16px 0 0; font-size:14px; line-height:1.5; color:#7C8CBC; text-wrap:pretty;">Устаза по арабскому языку до меня работала с топовыми продюсерами и уходила в минус. Эксперт по стройности — при средних охватах около 100, эксперт по обучению монтажу — около 70.</p>
+      <div data-reveal style="font-family:var(--font-display); font-weight:800; font-size:13px; letter-spacing:.18em; text-transform:uppercase; color:#7C8CBC; margin-bottom:18px;">С кем я работала</div>
+      <div id="cases" data-reveal-group data-reveal-step="0.05" style="display:flex; flex-direction:column; gap:10px;"></div>
+      <p data-reveal style="margin:20px 0 0; font-size:14px; line-height:1.5; color:#7C8CBC; text-wrap:pretty;">Устаза по арабскому языку до меня работала с топовыми продюсерами и уходила в минус. Эксперт по стройности — при средних охватах около 100, эксперт по обучению монтажу — около 70.</p>
     </div>
   </section>
 
   <!-- 6. REGISTRATION -->
-  <section id="reg" style="padding:clamp(48px,8vw,96px) clamp(16px,5vw,40px) clamp(60px,9vw,110px); position:relative;">
+  <section id="reg" style="padding:clamp(64px,8vw,96px) clamp(22px,5vw,40px) clamp(76px,9vw,110px); position:relative;">
     <div style="position:absolute; inset:auto 15% -20% 15%; height:420px; background:radial-gradient(ellipse at 50% 100%, rgba(240,192,90,.16), rgba(5,13,36,0) 70%); pointer-events:none;"></div>
-    <div style="position:relative; max-width:620px; margin:0 auto; padding:clamp(24px,4vw,44px); border-radius:22px; background:linear-gradient(180deg,#122258 0%,#0A1540 100%); border:1px solid rgba(240,192,90,.35); box-shadow:inset 0 1px 0 rgba(255,255,255,.08), 0 26px 60px rgba(0,0,0,.5); text-align:center;">
+    <div data-reveal style="position:relative; max-width:620px; margin:0 auto; padding:clamp(30px,4vw,44px); border-radius:22px; background:linear-gradient(180deg,#122258 0%,#0A1540 100%); border:1px solid rgba(240,192,90,.35); box-shadow:inset 0 1px 0 rgba(255,255,255,.08), 0 26px 60px rgba(0,0,0,.5); text-align:center;">
       <h2 style="margin:0 0 12px; font-family:var(--font-display); font-weight:900; text-transform:uppercase; font-size:clamp(22px,4.2vw,38px); line-height:1.02; letter-spacing:-.02em;">Занять место <span style="color:#F0C05A;">в игре</span></h2>
       <p style="margin:0 0 8px; font-size:16px; line-height:1.5; color:#B9C4E4;">Оставьте ник в телеграме — и заходите в канал, эфир пройдёт там.</p>
       <p style="margin:0 0 24px; font-family:var(--font-display); font-weight:700; font-size:13px; letter-spacing:.14em; text-transform:uppercase; color:#F0C05A;" data-air-date></p>
@@ -244,7 +264,7 @@
     </div>
   </section>
 
-  <footer style="padding:0 clamp(16px,5vw,40px) 48px; text-align:center;">
+  <footer style="padding:0 clamp(22px,5vw,40px) 56px; text-align:center;">
     <div style="max-width:620px; margin:0 auto; font-family:var(--font-display); font-weight:800; font-size:12px; letter-spacing:.22em; text-transform:uppercase; color:#4E5B85;">Свои запуски · <a href="https://t.me/UMM_RONNY">@UMM_RONNY</a></div>
   </footer>
 </div>
@@ -386,6 +406,7 @@
   // ---- Game board: cells flip on click/tap to reveal the topic ----
   var board = document.getElementById('board');
   var allCells = [];
+  var cellWraps = [];
 
   COLUMNS.forEach(function (column, ci) {
     var col = el('div', { style: 'display:flex; flex-direction:column; gap:clamp(6px,1vw,10px);' });
@@ -405,9 +426,9 @@
 
     column.cells.forEach(function (topic, ri) {
       var price = PRICES[ri];
-      var wrap = el('div', {
-        style: 'animation: cellIn .5s cubic-bezier(.22,1,.36,1) both; animation-delay:' + (0.05 * (ci + ri * 1.4)).toFixed(2) + 's;'
-      });
+      // diagonal cascade — the delay grows across columns and, faster, down rows
+      var wrap = el('div', { 'class': 'cell-wrap' });
+      wrap.style.setProperty('--d', (0.05 * (ci + ri * 1.4)).toFixed(2) + 's');
 
       var cell = el('button', {
         'class': 'cell',
@@ -440,6 +461,7 @@
       });
 
       allCells.push(cell);
+      cellWraps.push(wrap);
       wrap.appendChild(cell);
       col.appendChild(wrap);
     });
@@ -703,6 +725,62 @@
     // write to the sheet fails — the failure is reported in the console.
     sendToSheet(entry).then(function () { showSuccess(entry); });
   });
+
+  // ---- Scroll reveal ----
+  // Blocks fade and rise into place as they enter the viewport. Marked up with
+  // data-reveal (a single block) and data-reveal-group (stagger the children).
+  // The hidden state lives behind .js-anim, added here, so the page degrades to
+  // plain visible content when the script does not run.
+  (function initReveal() {
+    var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var root = document.documentElement;
+    root.classList.add('js-anim');
+
+    // Reduced motion: everything is already visible via the media query above.
+    if (reduced || !('IntersectionObserver' in window)) {
+      root.classList.remove('js-anim');
+      return;
+    }
+
+    var jobs = new WeakMap();
+    var observer = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (!entry.isIntersecting) return;
+        observer.unobserve(entry.target);
+        var run = jobs.get(entry.target);
+        if (run) { jobs.delete(entry.target); run(); }
+      });
+    }, { rootMargin: '0px 0px -8% 0px', threshold: 0.06 });
+
+    function whenVisible(trigger, run) {
+      jobs.set(trigger, run);
+      observer.observe(trigger);
+    }
+
+    function show(nodes) {
+      nodes.forEach(function (n) { n.classList.add('is-in'); });
+    }
+
+    // single blocks
+    Array.prototype.forEach.call(document.querySelectorAll('[data-reveal]'), function (node) {
+      node.classList.add('reveal');
+      whenVisible(node, function () { show([node]); });
+    });
+
+    // staggered groups — the container triggers, its children animate in sequence
+    Array.prototype.forEach.call(document.querySelectorAll('[data-reveal-group]'), function (group) {
+      var step = parseFloat(group.getAttribute('data-reveal-step')) || 0.07;
+      var children = Array.prototype.slice.call(group.children);
+      children.forEach(function (child, i) {
+        child.classList.add('reveal');
+        child.style.setProperty('--d', (i * step).toFixed(2) + 's');
+      });
+      whenVisible(group, function () { show(children); });
+    });
+
+    // the board keeps its own diagonal delays, already set on each .cell-wrap
+    whenVisible(board, function () { show(cellWraps); });
+  })();
 })();
 </script>
 </body>
