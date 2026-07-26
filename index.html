@@ -42,12 +42,42 @@
   .btn-fire:active { transform:scale(.97); }
   .btn-fire.full { width:100%; }
 
-  .cell { position:relative; aspect-ratio:16/7; min-height:44px; display:flex; align-items:center; justify-content:center;
-    border-radius:10px; background:linear-gradient(180deg,#122258 0%,#0A1540 100%); border:1px solid rgba(240,192,90,.28);
-    box-shadow:inset 0 1px 0 rgba(255,255,255,.08), 0 10px 22px rgba(0,0,0,.38); cursor:pointer;
-    transition:transform .22s cubic-bezier(.22,1,.36,1), box-shadow .22s ease, border-color .22s ease; overflow:hidden; }
-  .cell:hover { transform:translateY(-5px); border-color:rgba(240,192,90,.7);
+  .cell { position:relative; aspect-ratio:16/7; min-height:44px; width:100%; display:block; padding:0; border:none;
+    background:none; cursor:pointer; font:inherit; color:inherit; perspective:900px;
+    transition:transform .22s cubic-bezier(.22,1,.36,1); }
+  .cell:hover { transform:translateY(-5px); }
+  .cell:focus-visible { outline:2px solid rgba(240,192,90,.9); outline-offset:3px; border-radius:12px; }
+
+  .cell-inner { position:relative; width:100%; height:100%; transform-style:preserve-3d;
+    transition:transform .55s cubic-bezier(.22,1,.36,1); }
+  .cell.is-flipped .cell-inner { transform:rotateY(180deg); }
+
+  .cell-face { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center;
+    gap:3px; border-radius:10px; overflow:hidden; padding:6px 8px; text-align:center;
+    -webkit-backface-visibility:hidden; backface-visibility:hidden;
+    transition:box-shadow .22s ease, border-color .22s ease; }
+
+  .cell-front { background:linear-gradient(180deg,#122258 0%,#0A1540 100%); border:1px solid rgba(240,192,90,.28);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.08), 0 10px 22px rgba(0,0,0,.38); }
+  .cell:hover .cell-front { border-color:rgba(240,192,90,.7);
     box-shadow:inset 0 1px 0 rgba(255,255,255,.14), 0 16px 34px rgba(0,0,0,.5), 0 0 30px rgba(240,192,90,.22); }
+
+  .cell-back { transform:rotateY(180deg); background:linear-gradient(180deg,#1B2E6E 0%,#101F52 100%);
+    border:1px solid rgba(240,192,90,.55);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.12), 0 10px 22px rgba(0,0,0,.38), 0 0 26px rgba(240,192,90,.14); }
+  .cell:hover .cell-back { border-color:rgba(240,192,90,.8);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.16), 0 16px 34px rgba(0,0,0,.5), 0 0 32px rgba(240,192,90,.26); }
+
+  .cell-topic { font-family:var(--font-display); font-weight:700; font-size:clamp(10px,1.45vw,14px); line-height:1.2;
+    letter-spacing:.005em; color:#F3E4BE; text-wrap:balance; }
+  .cell-insider { font-family:var(--font-display); font-weight:800; font-size:9px; letter-spacing:.18em;
+    text-transform:uppercase; color:#F0C05A; opacity:.85; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .cell-inner { transition:none; }
+    .cell { transition:none; }
+    .cell:hover { transform:none; }
+  }
 
   .topic-card { transition:transform .22s cubic-bezier(.22,1,.36,1), box-shadow .22s ease; }
   .topic-card:hover { transform:translateY(-4px); box-shadow:inset 0 1px 0 rgba(255,255,255,.12), 0 18px 36px rgba(0,0,0,.48), 0 0 28px rgba(240,192,90,.16); }
@@ -60,10 +90,30 @@
 
   #nick:focus { border-color:rgba(240,192,90,.75); box-shadow:0 0 0 4px rgba(240,192,90,.12); }
 
-  .cat-badge { position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
-    background:linear-gradient(180deg,rgba(240,192,90,.96),rgba(220,168,60,.96)); color:#0A1330;
-    font-family:var(--font-display); font-weight:900; text-transform:uppercase; font-size:clamp(11px,1.7vw,16px);
-    letter-spacing:.02em; text-align:center; padding:6px; }
+  .reveal-all { appearance:none; cursor:pointer; font-family:var(--font-display); font-weight:700; font-size:12px;
+    letter-spacing:.14em; text-transform:uppercase; color:#F0C05A; background:transparent;
+    border:1px solid rgba(240,192,90,.35); border-radius:999px; padding:9px 18px;
+    transition:border-color .2s ease, background .2s ease, color .2s ease; }
+  .reveal-all:hover { border-color:rgba(240,192,90,.7); background:rgba(240,192,90,.08); color:#FFD98A; }
+  .reveal-all:focus-visible { outline:2px solid rgba(240,192,90,.9); outline-offset:3px; }
+
+  .field-input { width:100%; padding:18px 20px; border-radius:999px; background:#071026;
+    border:1px solid rgba(240,192,90,.32); color:#EAEFFB; font-family:var(--font-body); font-size:17px;
+    outline:none; text-align:center; }
+  .field-input:focus { border-color:rgba(240,192,90,.75); box-shadow:0 0 0 4px rgba(240,192,90,.12); }
+  .field-input[aria-invalid="true"] { border-color:rgba(255,138,76,.8); }
+
+  .mode-toggle { appearance:none; background:none; border:none; cursor:pointer; padding:0;
+    font-family:var(--font-body); font-size:14px; line-height:1.45; color:#8E9CC6;
+    text-decoration:underline; text-underline-offset:3px; transition:color .2s ease; }
+  .mode-toggle:hover { color:#F0C05A; }
+  .mode-toggle:focus-visible { outline:2px solid rgba(240,192,90,.9); outline-offset:3px; border-radius:4px; }
+
+  .btn-fire[disabled] { opacity:.6; cursor:progress; }
+  .btn-fire[disabled]:hover { transform:none; }
+
+  /* honeypot — hidden from people, visible to naive bots */
+  .hp-field { position:absolute; left:-9999px; width:1px; height:1px; overflow:hidden; }
 </style>
 </head>
 <body>
@@ -104,6 +154,11 @@
           <span style="font-family:var(--font-display); font-weight:700; font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:#F0C05A; border:1px solid rgba(240,192,90,.35); border-radius:999px; padding:7px 14px;">20 вопросов</span>
           <span style="font-family:var(--font-display); font-weight:700; font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:#F0C05A; border:1px solid rgba(240,192,90,.35); border-radius:999px; padding:7px 14px;">Разбор в прямом эфире</span>
         </div>
+      </div>
+
+      <div style="display:flex; flex-wrap:wrap; align-items:center; justify-content:center; gap:12px; margin-bottom:clamp(14px,2.5vw,22px);">
+        <span style="font-size:clamp(13px,1.7vw,15px); line-height:1.45; color:#8E9CC6;">Нажмите на клетку — покажу тему. Разбор каждой — в прямом эфире.</span>
+        <button type="button" id="reveal-all" class="reveal-all" aria-pressed="false">Показать все темы</button>
       </div>
 
       <div id="board" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(150px, 1fr)); gap:clamp(6px,1vw,12px);"></div>
@@ -160,19 +215,31 @@
     <div style="position:absolute; inset:auto 15% -20% 15%; height:420px; background:radial-gradient(ellipse at 50% 100%, rgba(240,192,90,.16), rgba(5,13,36,0) 70%); pointer-events:none;"></div>
     <div style="position:relative; max-width:620px; margin:0 auto; padding:clamp(24px,4vw,44px); border-radius:22px; background:linear-gradient(180deg,#122258 0%,#0A1540 100%); border:1px solid rgba(240,192,90,.35); box-shadow:inset 0 1px 0 rgba(255,255,255,.08), 0 26px 60px rgba(0,0,0,.5); text-align:center;">
       <h2 style="margin:0 0 12px; font-family:var(--font-display); font-weight:900; text-transform:uppercase; font-size:clamp(22px,4.2vw,38px); line-height:1.02; letter-spacing:-.02em;">Занять место <span style="color:#F0C05A;">в игре</span></h2>
-      <p style="margin:0 0 8px; font-size:16px; line-height:1.5; color:#B9C4E4;">Оставьте ник в телеграме — пришлю ссылку на эфир прямо в личку.</p>
+      <p style="margin:0 0 8px; font-size:16px; line-height:1.5; color:#B9C4E4;">Оставьте ник в телеграме — и заходите в канал, эфир пройдёт там.</p>
       <p style="margin:0 0 24px; font-family:var(--font-display); font-weight:700; font-size:13px; letter-spacing:.14em; text-transform:uppercase; color:#F0C05A;" data-air-date></p>
 
       <form id="reg-form" style="display:flex; flex-direction:column; gap:14px;" novalidate>
-        <input id="nick" name="nick" type="text" autocomplete="off" placeholder="@nickname" aria-label="Ник в телеграме" style="width:100%; padding:18px 20px; border-radius:999px; background:#071026; border:1px solid rgba(240,192,90,.32); color:#EAEFFB; font-family:var(--font-body); font-size:17px; outline:none; text-align:center;">
-        <span id="nick-error" role="alert" style="display:none; font-size:13px; line-height:1.45; color:#FF8A4C;">Введите ник в телеграме — минимум 3 символа.</span>
-        <button type="submit" class="btn-fire full">ИДУ НА ЭФИР — БЕСПЛАТНО</button>
-        <span style="font-size:13px; line-height:1.45; color:#7C8CBC;">Только телеграм. Без телефонов и почты.</span>
+        <input id="nick" name="nick" type="text" autocomplete="username" class="field-input" placeholder="@nickname" aria-label="Ник в телеграме">
+        <input id="phone" name="phone" type="tel" autocomplete="tel" class="field-input" placeholder="+7 900 123-45-67" aria-label="Номер телефона" hidden>
+
+        <span id="form-error" role="alert" style="display:none; font-size:13px; line-height:1.45; color:#FF8A4C;"></span>
+
+        <button type="button" id="mode-toggle" class="mode-toggle">Нет ника в телеграме — оставлю номер</button>
+
+        <div class="hp-field" aria-hidden="true">
+          <label for="website">Не заполняйте это поле</label>
+          <input id="website" name="website" type="text" tabindex="-1" autocomplete="off">
+        </div>
+
+        <button type="submit" id="reg-submit" class="btn-fire full">ИДУ НА ЭФИР — БЕСПЛАТНО</button>
+        <span style="font-size:13px; line-height:1.45; color:#7C8CBC;">Ник в телеграме или номер телефона. Почту не спрашиваем.</span>
       </form>
 
-      <div id="reg-success" style="display:none; flex-direction:column; gap:10px; padding:26px 18px; border-radius:16px; background:rgba(240,192,90,.1); border:1px solid rgba(240,192,90,.4);">
+      <div id="reg-success" style="display:none; flex-direction:column; gap:14px; padding:26px 18px; border-radius:16px; background:rgba(240,192,90,.1); border:1px solid rgba(240,192,90,.4);">
         <span style="font-family:var(--font-display); font-weight:900; text-transform:uppercase; font-size:clamp(18px,3vw,26px); color:#F0C05A;">Вы в игре</span>
         <span id="reg-success-text" style="font-size:16px; line-height:1.5; color:#D3DCF3;"></span>
+        <a id="channel-link" class="btn-fire full" href="#" target="_blank" rel="noopener noreferrer">ПЕРЕЙТИ В КАНАЛ</a>
+        <span style="font-size:13px; line-height:1.45; color:#7C8CBC;">Эфир пройдёт в канале. Подпишитесь сейчас, чтобы не пропустить начало.</span>
       </div>
     </div>
   </section>
@@ -186,16 +253,75 @@
 (function () {
   'use strict';
 
-  // ---- Configurable parameters (open item #5: confirm before publishing) ----
+  // ---- Configurable parameters (see «Настройка» in README.md) ----
   var CONFIG = {
     airDate: '29 июля · 14:00 МСК',
     airDateISO: '2026-07-29T14:00:00+03:00',
-    catInBag: true
+
+    // Telegram channel where the broadcast happens — shown right after registration.
+    channelUrl: 'https://t.me/+7f0kfydrEiU0MjZi',
+
+    // Google Apps Script Web App URL that appends each registration to the Google Sheet.
+    // Deploy apps-script/Code.gs (see README) and paste the /exec URL here.
+    // While this is empty, registrations are NOT saved anywhere.
+    sheetEndpoint: ''
   };
 
   // ---- Data ----
-  var COLUMN_TITLES = ['ЛИШЬ БЫ ПОДПИСАЛИСЬ', 'ГДЕ ВЫ, ЛЮДИ', 'ЗА КАДРОМ', 'НАКОНЕЦ-ТО ДЕНЬГИ'];
+  // NOTE: the «Кот в мешке» surprise is deliberately absent from this page. Per the broadcast
+  // script it hides under «Наконец-то деньги — 400» and must not be mentioned in advance.
   var PRICES = [100, 200, 300, 400, 500];
+
+  // Each column: the playful board title, the plain topic beneath it, and the five cell topics
+  // (index 0 → 100 … index 4 → 500). The 500 row is insider material.
+  var COLUMNS = [
+    {
+      title: 'ЛИШЬ БЫ ПОДПИСАЛИСЬ',
+      subtitle: 'подписка',
+      cells: [
+        'Почему на блог подписываются легко',
+        'Скромный ролик против миллионника',
+        'Один шаблон на весь год',
+        'Семь касаний',
+        'Почему подписка сейчас ничего не значит'
+      ]
+    },
+    {
+      title: 'ГДЕ ВЫ, ЛЮДИ',
+      subtitle: 'лид-магнит и трафик',
+      cells: [
+        'Почему «подпишись на телеграм» не работает',
+        'Лид-магнит за один вечер',
+        'Позиционирование — потом',
+        'Пришла на одну тему — хочет всё',
+        'Трафик, который нужен был вчера'
+      ]
+    },
+    {
+      title: 'ЗА КАДРОМ',
+      subtitle: 'личный контент',
+      cells: [
+        'Что удерживает людей на годы',
+        'Личное без лица и голоса',
+        'Регулярность важнее качества',
+        'Два приёма + правило 80/20',
+        'Главный вор регулярности'
+      ]
+    },
+    {
+      title: 'НАКОНЕЦ-ТО ДЕНЬГИ',
+      subtitle: 'длинный контент',
+      cells: [
+        'Почему длинный контент = деньги',
+        'Сколько бесплатного давать',
+        'Микропродукт за 1000',
+        'Схема запуска',
+        'Почему у вас «одни халявщики»'
+      ]
+    }
+  ];
+
+  var INSIDER_ROW = 4; // the 500 row is marked «инсайд»
 
   var PAINS = [
     'Подписчицы приходят, а заявок и оплат нет.',
@@ -257,51 +383,90 @@
     n.textContent = CONFIG.airDate;
   });
 
-  // ---- Game board (with cascade animation + "cat in bag" easter egg) ----
+  // ---- Game board: cells flip on click/tap to reveal the topic ----
   var board = document.getElementById('board');
-  var catKey = CONFIG.catInBag
-    ? (Math.floor(Math.random() * COLUMN_TITLES.length) + '-' + Math.floor(Math.random() * PRICES.length))
-    : null;
-  var supportsHover = window.matchMedia && window.matchMedia('(hover: hover)').matches;
+  var allCells = [];
 
-  COLUMN_TITLES.forEach(function (title, ci) {
+  COLUMNS.forEach(function (column, ci) {
     var col = el('div', { style: 'display:flex; flex-direction:column; gap:clamp(6px,1vw,10px);' });
-    col.appendChild(el('div', {
-      style: 'min-height:clamp(48px,6vw,64px); display:flex; align-items:center; justify-content:center; text-align:center; padding:8px; border-radius:10px; background:linear-gradient(180deg,#16265E,#0C1740); border:1px solid rgba(240,192,90,.35); font-family:var(--font-display); font-weight:800; text-transform:uppercase; font-size:clamp(12px,1.5vw,15px); line-height:1.15; letter-spacing:.02em; color:#F3E4BE; text-wrap:balance;',
-      text: title
-    }));
 
-    PRICES.forEach(function (price, ri) {
-      var key = ci + '-' + ri;
+    var head = el('div', {
+      style: 'min-height:clamp(48px,6vw,64px); display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; gap:3px; padding:8px; border-radius:10px; background:linear-gradient(180deg,#16265E,#0C1740); border:1px solid rgba(240,192,90,.35);'
+    });
+    head.appendChild(el('span', {
+      style: 'font-family:var(--font-display); font-weight:800; text-transform:uppercase; font-size:clamp(12px,1.5vw,15px); line-height:1.15; letter-spacing:.02em; color:#F3E4BE; text-wrap:balance;',
+      text: column.title
+    }));
+    head.appendChild(el('span', {
+      style: 'font-family:var(--font-body); font-weight:400; font-size:clamp(10px,1.1vw,12px); line-height:1.2; color:#8E9CC6;',
+      text: column.subtitle
+    }));
+    col.appendChild(head);
+
+    column.cells.forEach(function (topic, ri) {
+      var price = PRICES[ri];
       var wrap = el('div', {
         style: 'animation: cellIn .5s cubic-bezier(.22,1,.36,1) both; animation-delay:' + (0.05 * (ci + ri * 1.4)).toFixed(2) + 's;'
       });
-      var cell = el('div', { 'class': 'cell', role: 'presentation' });
-      cell.appendChild(el('span', {
+
+      var cell = el('button', {
+        'class': 'cell',
+        type: 'button',
+        'aria-expanded': 'false',
+        'aria-label': column.title + ', ' + price + '. Показать тему'
+      });
+
+      var inner = el('div', { 'class': 'cell-inner' });
+
+      var front = el('div', { 'class': 'cell-face cell-front' });
+      front.appendChild(el('span', {
         style: 'font-family:var(--font-display); font-weight:900; font-size:clamp(20px,3.4vw,34px); letter-spacing:-.01em; color:#F0C05A; text-shadow:0 2px 14px rgba(240,192,90,.35);',
         text: String(price)
       }));
 
-      if (catKey === key) {
-        var badge = el('span', { 'class': 'cat-badge', text: 'Кот в мешке' });
-        badge.style.display = 'none';
-        cell.appendChild(badge);
-        if (supportsHover) {
-          cell.addEventListener('mouseenter', function () { badge.style.display = 'flex'; });
-          cell.addEventListener('mouseleave', function () { badge.style.display = 'none'; });
-        } else {
-          // Tap variant for touch devices (open item #3)
-          cell.addEventListener('click', function () {
-            badge.style.display = badge.style.display === 'flex' ? 'none' : 'flex';
-          });
-        }
+      var back = el('div', { 'class': 'cell-face cell-back' });
+      if (ri === INSIDER_ROW) {
+        back.appendChild(el('span', { 'class': 'cell-insider', text: 'инсайд' }));
       }
+      back.appendChild(el('span', { 'class': 'cell-topic', text: topic }));
 
+      inner.appendChild(front);
+      inner.appendChild(back);
+      cell.appendChild(inner);
+
+      cell.addEventListener('click', function () {
+        setFlipped(cell, !cell.classList.contains('is-flipped'));
+        syncRevealAll();
+      });
+
+      allCells.push(cell);
       wrap.appendChild(cell);
       col.appendChild(wrap);
     });
 
     board.appendChild(col);
+  });
+
+  function setFlipped(cell, flipped) {
+    cell.classList.toggle('is-flipped', flipped);
+    cell.setAttribute('aria-expanded', flipped ? 'true' : 'false');
+    var label = cell.getAttribute('aria-label').replace(/(Показать|Скрыть) тему$/, flipped ? 'Скрыть тему' : 'Показать тему');
+    cell.setAttribute('aria-label', label);
+  }
+
+  // ---- "Reveal all" toggle ----
+  var revealAll = document.getElementById('reveal-all');
+
+  function syncRevealAll() {
+    var every = allCells.every(function (c) { return c.classList.contains('is-flipped'); });
+    revealAll.textContent = every ? 'Скрыть все темы' : 'Показать все темы';
+    revealAll.setAttribute('aria-pressed', every ? 'true' : 'false');
+  }
+
+  revealAll.addEventListener('click', function () {
+    var show = !allCells.every(function (c) { return c.classList.contains('is-flipped'); });
+    allCells.forEach(function (c) { setFlipped(c, show); });
+    syncRevealAll();
   });
 
   // ---- Pains ----
@@ -419,29 +584,124 @@
   // ---- Registration form ----
   var form = document.getElementById('reg-form');
   var nickInput = document.getElementById('nick');
-  var nickError = document.getElementById('nick-error');
+  var phoneInput = document.getElementById('phone');
+  var honeypot = document.getElementById('website');
+  var formError = document.getElementById('form-error');
+  var modeToggle = document.getElementById('mode-toggle');
+  var submitBtn = document.getElementById('reg-submit');
   var success = document.getElementById('reg-success');
   var successText = document.getElementById('reg-success-text');
+  var channelLink = document.getElementById('channel-link');
 
+  channelLink.href = CONFIG.channelUrl;
+
+  var mode = 'telegram'; // 'telegram' | 'phone'
+
+  function showError(msg, field) {
+    formError.textContent = msg;
+    formError.style.display = 'block';
+    if (field) { field.setAttribute('aria-invalid', 'true'); field.focus(); }
+  }
+
+  function clearError() {
+    formError.style.display = 'none';
+    nickInput.removeAttribute('aria-invalid');
+    phoneInput.removeAttribute('aria-invalid');
+  }
+
+  modeToggle.addEventListener('click', function () {
+    clearError();
+    mode = mode === 'telegram' ? 'phone' : 'telegram';
+    var phoneMode = mode === 'phone';
+    nickInput.hidden = phoneMode;
+    phoneInput.hidden = !phoneMode;
+    modeToggle.textContent = phoneMode
+      ? 'У меня есть ник в телеграме'
+      : 'Нет ника в телеграме — оставлю номер';
+    (phoneMode ? phoneInput : nickInput).focus();
+  });
+
+  // «@» is added automatically, spaces and extra «@» are stripped
   nickInput.addEventListener('input', function () {
     var v = nickInput.value.replace(/\s/g, '');
     if (v && v[0] !== '@') v = '@' + v.replace(/@/g, '');
     nickInput.value = v;
-    nickError.style.display = 'none';
+    clearError();
   });
+
+  // keep digits, allow a single leading «+»
+  phoneInput.addEventListener('input', function () {
+    var raw = phoneInput.value;
+    var plus = raw.trim().charAt(0) === '+';
+    var digits = raw.replace(/\D/g, '');
+    phoneInput.value = (plus ? '+' : '') + digits;
+    clearError();
+  });
+
+  function collect() {
+    if (mode === 'phone') {
+      var phone = phoneInput.value.trim();
+      if (phone.replace(/\D/g, '').length < 10) {
+        showError('Введите номер телефона полностью — минимум 10 цифр.', phoneInput);
+        return null;
+      }
+      return { type: 'phone', contact: phone };
+    }
+    var nick = nickInput.value.trim();
+    if (nick.replace(/@/g, '').length < 3) {
+      showError('Введите ник в телеграме — минимум 3 символа после «@».', nickInput);
+      return null;
+    }
+    return { type: 'telegram', contact: nick };
+  }
+
+  // Sends the registration to the Google Sheet via the Apps Script Web App.
+  // Content-Type is text/plain so the browser treats it as a simple request and skips
+  // the CORS preflight, which Apps Script does not answer.
+  function sendToSheet(entry) {
+    if (!CONFIG.sheetEndpoint) {
+      console.warn('[reg] CONFIG.sheetEndpoint is empty — the registration was NOT saved:', entry);
+      return Promise.resolve(false);
+    }
+    return fetch(CONFIG.sheetEndpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({
+        type: entry.type,
+        contact: entry.contact,
+        page: location.href,
+        referrer: document.referrer || '',
+        userAgent: navigator.userAgent
+      })
+    }).then(function () { return true; })
+      .catch(function (err) { console.error('[reg] failed to save the registration:', err); return false; });
+  }
+
+  function showSuccess(entry) {
+    successText.textContent = entry.type === 'telegram'
+      ? 'Записала вас, ' + entry.contact + '. Остался последний шаг — заходите в канал, напоминание пришлю перед эфиром.'
+      : 'Записала ваш номер ' + entry.contact + '. Остался последний шаг — заходите в канал, эфир пройдёт там.';
+    form.style.display = 'none';
+    success.style.display = 'flex';
+    success.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+  }
 
   form.addEventListener('submit', function (e) {
     e.preventDefault();
-    var v = nickInput.value.trim();
-    if (v.length < 3) {
-      nickError.style.display = 'block';
-      nickInput.focus();
-      return;
-    }
-    // NOTE (open item #1): no backend yet — wire up Telegram bot / CRM / webhook here.
-    form.style.display = 'none';
-    successText.textContent = 'Ссылку на эфир пришлю в телеграм ' + v + '. До встречи, иншаАллах.';
-    success.style.display = 'flex';
+
+    // a filled honeypot means a bot: pretend it worked, save nothing
+    if (honeypot.value) { showSuccess({ type: mode, contact: '' }); return; }
+
+    clearError();
+    var entry = collect();
+    if (!entry) return;
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'ОТПРАВЛЯЮ…';
+
+    // The channel link is the point of the form, so it is shown even if the
+    // write to the sheet fails — the failure is reported in the console.
+    sendToSheet(entry).then(function () { showSuccess(entry); });
   });
 })();
 </script>
